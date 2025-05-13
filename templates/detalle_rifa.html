@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Detalle de Rifa</title>
+</head>
+<body>
+    <header>
+        <nav class="bg-blue-600 p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div>
+                    <a href="/" class="text-white text-lg font-bold"><img src="{% static 'logo.png' %}" alt="logo" class="w-32 h-auto"></a>
+                </div>
+                <div>
+                    <a href="/" class="text-white hover:text-gray-200 px-4">Inicio</a>
+                    <a href="{% url 'mostrar_rifas_finalizadas' %}" class="text-white hover:text-gray-200 px-4">Rifas Finalizadas</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="flex justify-center items-center min-h-screen bg-gray-100">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl mx-[300px]">
+            <h1 class="text-3xl font-bold mb-4 text-center">{{ rifa.nombre }}</h1>
+            <img src="{{ rifa.imagen.url }}" alt="{{ rifa.nombre }}" class="w-full h-48 object-cover mb-4 rounded">
+            <p class="text-gray-600 mb-6">{{ rifa.descripcion }}</p>
+
+            <h2 class="text-xl font-semibold mb-4">Filtrar Números Disponibles:</h2>
+            <form action="{% url 'detalle_rifa' rifa.id %}" method="get" class="mb-4">
+                <div class="flex gap-4 mb-4">
+                    <input type="number" name="min_numero" placeholder="Número Mínimo" class="border border-gray-300 rounded-md p-2 w-full" min="1" />
+                    <input type="number" name="max_numero" placeholder="Número Máximo" class="border border-gray-300 rounded-md p-2 w-full" />
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500">Filtrar</button>
+            </form>
+
+            <h2 class="text-xl font-semibold mb-4">Números Disponibles:</h2>
+            <form action="{% url 'formulario' rifa.id %}" method="get">
+                {% csrf_token %}
+                <div class="max-h-60 overflow-y-auto grid grid-cols-6 gap-4 mb-4">
+                    {% for numero in numeros %}
+                    <label class="block">
+                        <input type="checkbox" name="numeros" value="{{ numero.numero }}" class="hidden peer" />
+                        <div class="border-2 border-gray-300 rounded-lg p-4 flex justify-center items-center cursor-pointer peer-checked:bg-blue-600 peer-checked:text-white">
+                            {{ numero.numero }}
+                        </div>
+                    </label>
+                    {% empty %}
+                    <p class="col-span-3 text-center text-gray-500">No hay números disponibles.</p>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500">Siguiente</button>
+            </form>
+        </div>
+
+        <!-- Sección de Premios -->
+        <div class="bg-white rounded-lg shadow-lg p-4 w-full max-w-md mt-[-500px] mx-[-150px]">
+            <h2 class="text-xl font-semibold mb-4">Premios Asociados:</h2>
+            <div class="grid grid-cols-1 gap-4">
+                {% for premio in rifa.premios.all %}
+                <div class="border-2 border-gray-300 rounded-lg p-4 flex items-center">
+                    <img src="{{ premio.imagen.url }}" alt="{{ premio.nombre }}" class="w-16 h-16 object-cover rounded mr-4">
+                    <span class="font-semibold">{{ premio.nombre }}</span>
+                </div>
+                {% empty %}
+                <p class="text-center text-gray-500">No hay premios asociados a esta rifa.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-blue-600 text-white py-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Rifas App. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
